@@ -9,16 +9,40 @@ const fetchMyIP = function(callback) {
     }
     
     if (response.statusCode !== 200) {
-      const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
-      callback(Error(msg), null);
+      const message = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
+      callback(Error(message), null);
       return;
     }
     
     const data = JSON.parse(body);
     callback(null, data.ip);
+
+  });
+};
+
+const fetchCoordsByIP = function(ip, callback) {
+  request(`https://freegeoip.app/json/${ip}`, (err2, response, body) => {
     
+    if (err2) {
+      callback(err2, null);
+      return;
+    }
+    
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching coordinates for IP. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+    
+    const { latitude, longitude } = JSON.parse(body);
+    
+    callback(null, { latitude, longitude });
+
   });
 };
 
 
-module.exports = { fetchMyIP };
+module.exports = {
+  fetchMyIP,
+  fetchCoordsByIP
+};
